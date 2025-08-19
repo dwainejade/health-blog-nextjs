@@ -116,14 +116,14 @@ export default function Footer() {
             >
               Terms
             </Link>
-            <a
+            <Link
               href="https://github.com/your-username/health-blog-data"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
             >
               GitHub
-            </a>
+            </Link>
           </div>
         </div>
       </div>

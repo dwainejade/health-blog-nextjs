@@ -1,6 +1,7 @@
 // src/app/blog/[slug]/page.js (Individual blog post page)
 import { notFound } from "next/navigation";
 import { mockBlogPosts } from "@/data/mockBlogData";
+import Link from "next/link";
 
 export async function generateMetadata({ params }) {
   const post = mockBlogPosts.find((p) => p.slug === params.slug);
@@ -119,12 +120,12 @@ export default function BlogPostPage({ params }) {
 
           {/* Back to Blog */}
           <div className="mt-12 pt-8 border-t border-gray-200">
-            <a
+            <Link
               href="/blog"
               className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
             >
               ← Back to all articles
-            </a>
+            </Link>
           </div>
         </div>
       </article>
