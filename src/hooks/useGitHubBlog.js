@@ -49,7 +49,7 @@ export const useGitHubBlog = (owner, repo, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [owner, repo, blogPath, token]);
+  }, [owner, repo, blogPath, githubService]);
 
   const refreshBlogs = useCallback(() => {
     fetchBlogs();
@@ -207,7 +207,7 @@ export const useGitHubRepoSearch = (token = null) => {
         setLoading(false);
       }
     },
-    [token]
+    [githubService]
   );
 
   return {
