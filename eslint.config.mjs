@@ -12,7 +12,6 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals"),
   {
-    files: ["**/*.js", "**/*.jsx"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
     },

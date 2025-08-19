@@ -81,7 +81,7 @@ const ProtectedRoute = ({ children, requireRole = null }) => {
             </h1>
 
             <p className="text-gray-600 mb-8">
-              You don't have permission to access this page. Contact an
+              You don&apos;t have permission to access this page. Contact an
               administrator if you believe this is an error.
             </p>
 

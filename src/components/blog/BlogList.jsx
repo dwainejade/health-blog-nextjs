@@ -57,13 +57,13 @@ const BlogList = () => {
     return filtered;
   }, [posts, selectedCategory, searchTerm]);
 
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-  };
+  // const handleSearch = (term) => {
+  //   setSearchTerm(term);
+  // };
 
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
-  };
+  // const handleCategoryChange = (categoryId) => {
+  //   setSelectedCategory(categoryId);
+  // };
 
   if (loading) {
     return (

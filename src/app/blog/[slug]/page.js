@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import { mockBlogPosts } from "@/data/mockBlogData";
 import Link from "next/link";
+import Image from "next/image";
 
 export async function generateMetadata({ params }) {
   const post = mockBlogPosts.find((p) => p.slug === params.slug);
@@ -45,13 +46,16 @@ export default function BlogPostPage({ params }) {
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Image */}
         <div className="aspect-w-16 aspect-h-9">
-          <img
+          <Image
             src={
               post.imageUrl ||
               "https://via.placeholder.com/800x450/f0f9ff/3b82f6?text=Health+Blog"
             }
             alt={post.title}
+            width={800}
+            height={450}
             className="w-full h-64 md:h-96 object-cover"
+            priority
           />
         </div>
 

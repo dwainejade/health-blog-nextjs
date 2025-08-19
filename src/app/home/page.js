@@ -10,9 +10,5 @@ export const metadata = {
 };
 
 export default function HomePage() {
-  return (
-    <div className="bg-gray-50 min-h-screen">
-      <BlogList />
-    </div>
-  );
+  return <BlogList />;
 }
