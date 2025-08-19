@@ -84,7 +84,7 @@ const Header = () => {
                 <span className="text-white font-bold text-sm">HB</span>
               </div>
               <h1 className="text-xl font-bold text-gray-900">
-                Your Health Blog
+                Cycles & Stages
               </h1>
             </Link>
           </div>

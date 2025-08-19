@@ -1,57 +1,98 @@
-// Blog Card Component
-function BlogCard({ post }) {
+// src/components/blog/BlogCard.jsx
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
+
+const BlogCard = ({ post, isLast = false }) => {
+  const formatDate = (dateString) => {
+    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+  };
+
+  const handleTagClick = (e, tag) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // TODO: Filter by tag or navigate to tag page
+    console.log(`Filter by tag: ${tag}`);
+  };
+
   return (
-    <article className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-      {post.featuredImage && (
-        <div className="aspect-video bg-gray-200">
-          <img
-            src={post.featuredImage}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
-      <div className="p-6">
-        <div className="flex items-center space-x-2 mb-3">
-          {post.category && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-              {post.category}
-            </span>
+    <article className={`py-8 ${!isLast ? "border-b border-gray-200" : ""}`}>
+      <Link href={`/blog/${post.slug}`} className="block group">
+        {/* Image */}
+        <div className="mb-6">
+          {post.imageUrl ? (
+            <img
+              src={post.imageUrl}
+              alt={post.title}
+              className="w-full h-64 object-cover rounded-lg group-hover:opacity-95 transition-opacity duration-200"
+            />
+          ) : (
+            <div className="w-full h-64 rounded-lg bg-gradient-to-br from-blue-200 via-purple-200 via-pink-200 to-blue-300 flex items-center justify-center group-hover:opacity-95 transition-opacity duration-200">
+              <div className="text-center text-white">
+                <div className="text-4xl mb-2">🌟</div>
+                <p className="text-lg font-medium opacity-90">
+                  Cycles & Stages
+                </p>
+              </div>
+            </div>
           )}
-          <time className="text-sm text-gray-500">
-            {new Date(post.date).toLocaleDateString()}
-          </time>
         </div>
 
-        <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
-          <Link
-            href={`/post/${post.slug}`}
-            className="hover:text-blue-600 transition-colors"
-          >
-            {post.title}
-          </Link>
-        </h2>
+        {/* Content */}
+        <div className="space-y-4">
+          {/* Tags and Meta */}
+          <div className="flex items-center gap-3 text-sm text-gray-500">
+            <time dateTime={post.publishedAt}>
+              {formatDate(post.publishedAt)}
+            </time>
+            <span>•</span>
+            <span>{post.readTime} min read</span>
+            {post.featured && (
+              <>
+                <span>•</span>
+                <span className="text-blue-600 font-medium">Featured</span>
+              </>
+            )}
+          </div>
 
-        {post.excerpt && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+          {/* Title */}
+          <h2 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
+            {post.title}
+          </h2>
+
+          {/* Excerpt */}
+          <p className="text-gray-600 text-lg leading-relaxed">
             {post.excerpt}
           </p>
-        )}
 
-        <div className="flex items-center justify-between">
-          <Link
-            href={`/post/${post.slug}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
-          >
-            Read more →
-          </Link>
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            {post.tags.slice(0, 3).map((tag) => (
+              <button
+                key={tag}
+                onClick={(e) => handleTagClick(e, tag)}
+                className="text-sm text-gray-500 hover:text-blue-600 bg-gray-100 hover:bg-blue-50 px-3 py-1 rounded-full transition-colors"
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
 
-          {post.views && (
-            <span className="text-xs text-gray-500">{post.views} views</span>
-          )}
+          {/* Author */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">
+              {post.author}
+            </span>
+            <span className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors group-hover:underline">
+              Read article →
+            </span>
+          </div>
         </div>
-      </div>
+      </Link>
     </article>
   );
-}
+};
+
+export default BlogCard;
