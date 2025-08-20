@@ -6,7 +6,7 @@ export const mockBlogPosts = [
     excerpt:
       "Discover natural methods to increase your energy levels throughout the day without relying on caffeine or sugar crashes.",
     content: "Full blog post content would go here...",
-    author: "Dr. Sarah Johnson",
+    author: "Leah Rawlins",
     publishedAt: "2025-01-15T10:00:00Z",
     updatedAt: "2025-01-15T10:00:00Z",
     tags: ["energy", "wellness", "lifestyle"],
@@ -22,7 +22,7 @@ export const mockBlogPosts = [
     excerpt:
       "Learn how mindful eating can transform your relationship with food and improve your overall health and wellbeing.",
     content: "Full blog post content would go here...",
-    author: "Dr. Sarah Johnson",
+    author: "Leah Rawlins",
     publishedAt: "2025-01-12T14:30:00Z",
     updatedAt: "2025-01-12T14:30:00Z",
     tags: ["nutrition", "mindfulness", "health"],
@@ -38,7 +38,7 @@ export const mockBlogPosts = [
     excerpt:
       "Create a workout routine that fits your lifestyle and actually sticks. No more gym intimidation or unrealistic goals.",
     content: "Full blog post content would go here...",
-    author: "Dr. Sarah Johnson",
+    author: "Leah Rawlins",
     publishedAt: "2025-01-10T09:15:00Z",
     updatedAt: "2025-01-10T09:15:00Z",
     tags: ["exercise", "fitness", "routine"],
@@ -54,7 +54,7 @@ export const mockBlogPosts = [
     excerpt:
       "Master the art of quality sleep with evidence-based tips for creating the perfect sleep environment and routine.",
     content: "Full blog post content would go here...",
-    author: "Dr. Sarah Johnson",
+    author: "Leah Rawlins",
     publishedAt: "2025-01-08T16:45:00Z",
     updatedAt: "2025-01-08T16:45:00Z",
     tags: ["sleep", "wellness", "health"],
@@ -70,7 +70,7 @@ export const mockBlogPosts = [
     excerpt:
       "Explore the connection between stress and mental health, plus practical strategies for managing stress in daily life.",
     content: "Full blog post content would go here...",
-    author: "Dr. Sarah Johnson",
+    author: "Leah Rawlins",
     publishedAt: "2025-01-05T11:20:00Z",
     updatedAt: "2025-01-05T11:20:00Z",
     tags: ["mental-health", "stress", "wellness"],
@@ -87,7 +87,7 @@ export const mockBlogPosts = [
     excerpt:
       "Dive deep into the science of hydration and discover how proper hydration affects every aspect of your health.",
     content: "Full blog post content would go here...",
-    author: "Dr. Sarah Johnson",
+    author: "Leah Rawlins",
     publishedAt: "2025-01-03T13:10:00Z",
     updatedAt: "2025-01-03T13:10:00Z",
     tags: ["hydration", "health", "nutrition"],

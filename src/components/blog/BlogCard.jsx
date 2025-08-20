@@ -29,7 +29,7 @@ const BlogCard = ({ post, isLast = false }) => {
               className="w-full h-64 object-cover rounded-lg group-hover:opacity-95 transition-opacity duration-200"
             />
           ) : (
-            <div className="w-full h-64 rounded-lg bg-gradient-to-br from-blue-200 via-purple-200 via-pink-200 to-blue-300 flex items-center justify-center group-hover:opacity-95 transition-opacity duration-200">
+            <div className="w-full h-96 rounded-lg card-gradient flex items-center justify-center group-hover:opacity-95 transition-opacity duration-200">
               <div className="text-center text-white">
                 <div className="text-4xl mb-2">🌟</div>
                 <p className="text-lg font-medium opacity-90">
