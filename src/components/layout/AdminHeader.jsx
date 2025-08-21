@@ -14,14 +14,12 @@ const AdminHeader = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-900">
-              Your Health Blog
-            </h1>
+            <h1 className="text-xl font-bold text-gray-900">Cycles</h1>
           </div>
 
           {/* Navigation & Auth */}
           <div className="flex items-center space-x-4">
-            {isAuthenticated() ? (
+            {isAuthenticated ? (
               <>
                 {/* Admin User Info */}
                 <div className="flex items-center space-x-3">

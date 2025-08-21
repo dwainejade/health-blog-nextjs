@@ -1,19 +1,25 @@
-// src/components/auth/ProtectedRoute.jsx - Fixed for Firebase Auth
-import React, { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+// src/components/auth/ProtectedRoute.jsx
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useAuthStore } from "@/stores/authStore";
 import Login from "./Login";
-import { FaLock, FaEdit } from "react-icons/fa";
+import { FaLock, FaEdit, FaSpinner } from "react-icons/fa";
 
 const ProtectedRoute = ({ children, requireRole = null }) => {
-  const { isAuthenticated, isAdmin, canEdit, loading } = useAuth();
+  const { user, loading, isAuthenticated, isAdmin, isRoleVerified } =
+    useAuthStore();
   const [showLogin, setShowLogin] = useState(false);
 
-  if (loading) {
+  // Show loading while Firebase auth or role check is pending
+  if (loading || (user && !isRoleVerified())) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <FaSpinner className="animate-spin h-12 w-12 text-blue-600 mx-auto" />
+          <p className="mt-4 text-gray-600">
+            {loading ? "Loading..." : "Verifying permissions..."}
+          </p>
         </div>
       </div>
     );
@@ -33,8 +39,8 @@ const ProtectedRoute = ({ children, requireRole = null }) => {
           </h1>
 
           <p className="text-gray-600 mb-8">
-            You need to be signed in to access this page. Only authorized
-            authors can create and edit blog posts.
+            You need to be signed in to access this page. Only authorized users
+            can access this content.
           </p>
 
           <button
@@ -51,53 +57,35 @@ const ProtectedRoute = ({ children, requireRole = null }) => {
     );
   }
 
-  // Check if user has required permissions based on requireRole
-  if (requireRole) {
-    let hasPermission = false;
-
-    switch (requireRole) {
-      case "admin":
-        hasPermission = isAdmin();
-        break;
-      case "canEdit":
-        hasPermission = canEdit();
-        break;
-      default:
-        // For any other role, check if user is admin (since we only have admins now)
-        hasPermission = isAdmin();
-        break;
-    }
-
-    if (!hasPermission) {
-      return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto p-6">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FaLock className="w-10 h-10 text-red-600" />
-            </div>
-
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Access Denied
-            </h1>
-
-            <p className="text-gray-600 mb-8">
-              You don&apos;t have permission to access this page. Contact an
-              administrator if you believe this is an error.
-            </p>
-
-            <button
-              onClick={() => window.history.back()}
-              className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
-            >
-              Go Back
-            </button>
+  // Check admin role requirement
+  if (requireRole === "admin" && !isAdmin()) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FaLock className="w-10 h-10 text-red-600" />
           </div>
+
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Admin Access Required
+          </h1>
+
+          <p className="text-gray-600 mb-8">
+            You don't have administrator privileges required to access this
+            page.
+          </p>
+
+          <button
+            onClick={() => window.history.back()}
+            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+          >
+            Go Back
+          </button>
         </div>
-      );
-    }
+      </div>
+    );
   }
 
-  // User is authenticated and has required permissions
   return children;
 };
 

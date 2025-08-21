@@ -20,7 +20,7 @@ const AdminRoute = ({ children }) => {
   }
 
   // Check if user is authenticated
-  if (!isAuthenticated()) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
