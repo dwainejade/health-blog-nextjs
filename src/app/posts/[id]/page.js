@@ -2,16 +2,21 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useFirebasePost } from "@/hooks/useFirebasePosts";
+import { useAuthStore } from "@/stores/authStore";
 import SafeImage from "@/components/ui/SafeImage";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { formatDistanceToNow, format } from "date-fns";
 import Link from "next/link";
+import "@/styles/editor.scss";
 
 const PostPage = () => {
   const params = useParams();
+  const router = useRouter();
+  const { isAdmin, user } = useAuthStore();
+
   // Ensure postId is always a string for Firebase compatibility
   const postId = String(decodeURIComponent(params.id));
 
@@ -60,11 +65,19 @@ const PostPage = () => {
     return "Unknown Author";
   };
 
-  // Get author avatar
+  // Get author avatar with Cloudinary optimization
   const getAuthorAvatar = () => {
-    if (post?.author?.bio?.avatar) return post.author.bio.avatar;
-    if (post?.authorAvatar) return post.authorAvatar;
-    return null;
+    const avatar = post?.author?.bio?.avatar || post?.authorAvatar;
+    if (!avatar) return null;
+
+    // If it's a Cloudinary URL, optimize it
+    if (avatar.includes("cloudinary.com")) {
+      return avatar.replace(
+        "/upload/",
+        "/upload/w_100,h_100,c_fill,f_auto,q_auto/"
+      );
+    }
+    return avatar;
   };
 
   // Get author bio
@@ -72,6 +85,44 @@ const PostPage = () => {
     if (post?.author?.bio?.description) return post.author.bio.description;
     if (post?.authorBio) return post.authorBio;
     return null;
+  };
+
+  // Get optimized featured image from Cloudinary
+  const getOptimizedFeaturedImage = () => {
+    const featuredImage = post?.featuredImage;
+    if (!featuredImage) return null;
+
+    // If it's a Cloudinary URL, optimize it for different screen sizes
+    if (featuredImage.includes("cloudinary.com")) {
+      return {
+        mobile: featuredImage.replace(
+          "/upload/",
+          "/upload/w_768,f_auto,q_auto/"
+        ),
+        tablet: featuredImage.replace(
+          "/upload/",
+          "/upload/w_1024,f_auto,q_auto/"
+        ),
+        desktop: featuredImage.replace(
+          "/upload/",
+          "/upload/w_1200,f_auto,q_auto/"
+        ),
+        original: featuredImage,
+      };
+    }
+
+    // For non-Cloudinary images, return the original
+    return {
+      mobile: featuredImage,
+      tablet: featuredImage,
+      desktop: featuredImage,
+      original: featuredImage,
+    };
+  };
+
+  // Handle edit button click
+  const handleEditPost = () => {
+    router.push(`/admin/edit/${postId}`);
   };
 
   if (loading) {
@@ -152,12 +203,13 @@ const PostPage = () => {
   }
 
   const dates = formatDate(post.createdAt);
+  const optimizedImages = getOptimizedFeaturedImage();
 
   return (
     <div className="min-h-screen bg-white">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Back to posts link */}
-        <div className="mb-8">
+        {/* Navigation and Admin Controls */}
+        <div className="mb-8 flex justify-between items-center">
           <Link
             href="/"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors"
@@ -177,6 +229,29 @@ const PostPage = () => {
             </svg>
             All Posts
           </Link>
+
+          {/* Admin Edit Button */}
+          {isAdmin() && (
+            <button
+              onClick={handleEditPost}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Edit Post
+            </button>
+          )}
         </div>
 
         {/* Article Header */}
@@ -203,7 +278,7 @@ const PostPage = () => {
           {/* Author and Date Info */}
           <div className="flex items-center justify-between border-b border-gray-200 pb-8">
             <div className="flex items-center space-x-4">
-              {/* Author Avatar */}
+              {/* Author Avatar with Cloudinary optimization */}
               {getAuthorAvatar() && (
                 <SafeImage
                   src={getAuthorAvatar()}
@@ -236,25 +311,49 @@ const PostPage = () => {
           </div>
         </header>
 
-        {/* Featured Image */}
-        {post.featuredImage && (
+        {/* Featured Image with Cloudinary optimization */}
+        {optimizedImages && (
           <div className="mb-12">
             <div className="aspect-video relative overflow-hidden rounded-lg bg-gray-100">
-              <SafeImage
-                src={post.featuredImage}
-                alt={post.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-              />
+              <picture>
+                <source
+                  media="(max-width: 768px)"
+                  srcSet={optimizedImages.mobile}
+                />
+                <source
+                  media="(max-width: 1024px)"
+                  srcSet={optimizedImages.tablet}
+                />
+                <SafeImage
+                  src={optimizedImages.desktop}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  priority
+                />
+              </picture>
             </div>
           </div>
         )}
 
-        {/* Article Content */}
+        {/* Article Content with enhanced image optimization */}
         <div className="prose prose-lg max-w-none mb-12">
           <div
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{
+              __html:
+                post.content?.replace(
+                  /<img([^>]+)src="([^"]*cloudinary[^"]*)"([^>]*)>/g,
+                  (match, before, src, after) => {
+                    // Optimize Cloudinary images in content
+                    const optimizedSrc = src.replace(
+                      "/upload/",
+                      "/upload/w_800,f_auto,q_auto/"
+                    );
+                    return `<img${before}src="${optimizedSrc}"${after} loading="lazy">`;
+                  }
+                ) || post.content,
+            }}
             className="prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
           />
         </div>

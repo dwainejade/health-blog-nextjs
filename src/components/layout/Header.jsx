@@ -141,23 +141,23 @@ const Header = () => {
                   {showContentDropdown && (
                     <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
                       <Link
-                        href="/admin/write"
+                        href="/admin/create-post"
                         onClick={() => setShowContentDropdown(false)}
                         className={`flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
-                          isActive("/admin/write")
+                          isActive("/admin/create-post")
                             ? "bg-blue-50 text-blue-700"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
                         <FaEdit className="w-4 h-4" />
-                        <span>Write New Post</span>
+                        <span>Create New Post</span>
                       </Link>
 
                       <Link
-                        href="/admin/drafts"
+                        href="/admin/manage-posts"
                         onClick={() => setShowContentDropdown(false)}
                         className={`flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
-                          isActive("/admin/drafts")
+                          isActive("/admin/manage-posts")
                             ? "bg-blue-50 text-blue-700"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}

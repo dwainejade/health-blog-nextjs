@@ -3,6 +3,7 @@ import {
   collection,
   doc,
   addDoc,
+  setDoc, // Add setDoc for custom IDs
   updateDoc,
   deleteDoc,
   getDocs,
@@ -23,24 +24,32 @@ class FirebasePostService {
     this.postsRef = collection(db, this.collectionName);
   }
 
-  // Create a new blog post
+  // Create a new blog post with slug as ID
   async createPost(postData) {
     try {
+      // Generate slug if not provided
+      const slug = postData.slug || this.generateSlug(postData.title);
+
+      // Check if slug already exists
+      await this.checkSlugAvailability(slug);
+
       const post = {
         ...postData,
+        slug: slug,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         views: 0,
         likes: 0,
-        status: postData.status || "draft", // draft, published, archived
+        status: postData.status || "draft",
         authorId: postData.authorId,
-        slug: postData.slug || this.generateSlug(postData.title),
       };
 
-      const docRef = await addDoc(this.postsRef, post);
+      // Use setDoc with slug as document ID instead of addDoc
+      const postRef = doc(db, this.collectionName, slug);
+      await setDoc(postRef, post);
 
       return {
-        id: docRef.id,
+        id: slug, // Document ID is now the slug
         ...post,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -51,10 +60,64 @@ class FirebasePostService {
     }
   }
 
+  // Check if slug is available
+  async checkSlugAvailability(slug) {
+    try {
+      const postRef = doc(db, this.collectionName, slug);
+      const postSnap = await getDoc(postRef);
+
+      if (postSnap.exists()) {
+        throw new Error(
+          `A post with slug "${slug}" already exists. Please choose a different title or provide a custom slug.`
+        );
+      }
+
+      return true;
+    } catch (error) {
+      if (error.message.includes("already exists")) {
+        throw error;
+      }
+      console.error("Error checking slug availability:", error);
+      throw new Error(`Failed to check slug availability: ${error.message}`);
+    }
+  }
+
   // Update an existing post
   async updatePost(postId, updates) {
     try {
       const postRef = doc(db, this.collectionName, postId);
+
+      // If title is being updated, we might need a new slug
+      if (updates.title && !updates.slug) {
+        const newSlug = this.generateSlug(updates.title);
+
+        // Only update slug if it's different and available
+        if (newSlug !== postId) {
+          await this.checkSlugAvailability(newSlug);
+
+          // Create new document with new slug
+          const currentPost = await this.getPostById(postId);
+          const newPost = {
+            ...currentPost,
+            ...updates,
+            slug: newSlug,
+            updatedAt: serverTimestamp(),
+          };
+
+          // Create new document
+          const newPostRef = doc(db, this.collectionName, newSlug);
+          await setDoc(newPostRef, newPost);
+
+          // Delete old document
+          await deleteDoc(postRef);
+
+          return {
+            ...newPost,
+            id: newSlug,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      }
 
       const updateData = {
         ...updates,
@@ -83,7 +146,7 @@ class FirebasePostService {
     }
   }
 
-  // Get a single post by ID
+  // Get a single post by ID (slug)
   async getPostById(postId) {
     try {
       const postRef = doc(db, this.collectionName, postId);
@@ -94,7 +157,7 @@ class FirebasePostService {
       }
 
       return {
-        id: postSnap.id,
+        id: postSnap.id, // This will be the slug
         ...postSnap.data(),
         createdAt: postSnap.data().createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: postSnap.data().updatedAt?.toDate?.()?.toISOString() || null,
@@ -105,27 +168,9 @@ class FirebasePostService {
     }
   }
 
-  // Get post by slug
+  // Get post by slug (now same as getPostById since ID is slug)
   async getPostBySlug(slug) {
-    try {
-      const q = query(this.postsRef, where("slug", "==", slug));
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        throw new Error("Post not found");
-      }
-
-      const doc = querySnapshot.docs[0];
-      return {
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null,
-        updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() || null,
-      };
-    } catch (error) {
-      console.error("Error getting post by slug:", error);
-      throw new Error(`Failed to get post: ${error.message}`);
-    }
+    return this.getPostById(slug);
   }
 
   // Get all published posts (with pagination)
@@ -145,7 +190,7 @@ class FirebasePostService {
       const querySnapshot = await getDocs(q);
 
       const posts = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
+        id: doc.id, // This will be the slug
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() || null,
@@ -178,7 +223,7 @@ class FirebasePostService {
       const querySnapshot = await getDocs(q);
 
       return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
+        id: doc.id, // This will be the slug
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() || null,
@@ -192,8 +237,6 @@ class FirebasePostService {
   // Search posts by title or content
   async searchPosts(searchTerm, status = "published") {
     try {
-      // Note: Firestore doesn't have full-text search built-in
-      // This is a basic implementation - consider using Algolia for better search
       const q = query(
         this.postsRef,
         where("status", "==", status),
@@ -203,7 +246,7 @@ class FirebasePostService {
       const querySnapshot = await getDocs(q);
 
       const allPosts = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
+        id: doc.id, // This will be the slug
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() || null,
@@ -237,7 +280,7 @@ class FirebasePostService {
       const querySnapshot = await getDocs(q);
 
       return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
+        id: doc.id, // This will be the slug
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: doc.data().updatedAt?.toDate?.()?.toISOString() || null,
@@ -263,11 +306,45 @@ class FirebasePostService {
 
   // Generate slug from title
   generateSlug(title) {
+    if (!title) {
+      throw new Error("Title is required to generate slug");
+    }
+
     return title
       .toLowerCase()
-      .replace(/[^\w\s-]/g, "") // Remove special characters
-      .replace(/[\s_-]+/g, "-") // Replace spaces and underscores with hyphens
+      .trim()
+      .replace(/[^\w\s-]/g, "") // Remove special characters except spaces and hyphens
+      .replace(/[\s_]+/g, "-") // Replace spaces and underscores with hyphens
+      .replace(/-+/g, "-") // Replace multiple consecutive hyphens with single hyphen
       .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+  }
+
+  // Generate unique slug (with suffix if needed)
+  async generateUniqueSlug(title) {
+    const baseSlug = this.generateSlug(title);
+    let slug = baseSlug;
+    let counter = 1;
+
+    while (true) {
+      try {
+        await this.checkSlugAvailability(slug);
+        return slug; // Slug is available
+      } catch (error) {
+        if (error.message.includes("already exists")) {
+          // Try with counter suffix
+          slug = `${baseSlug}-${counter}`;
+          counter++;
+
+          if (counter > 100) {
+            throw new Error(
+              "Unable to generate unique slug after 100 attempts"
+            );
+          }
+        } else {
+          throw error;
+        }
+      }
+    }
   }
 
   // Validate post data
@@ -277,6 +354,11 @@ class FirebasePostService {
 
     if (missing.length > 0) {
       throw new Error(`Missing required fields: ${missing.join(", ")}`);
+    }
+
+    // Validate title for slug generation
+    if (!postData.title.trim()) {
+      throw new Error("Title cannot be empty or just whitespace");
     }
 
     if (postData.slug && !/^[a-z0-9-]+$/.test(postData.slug)) {
