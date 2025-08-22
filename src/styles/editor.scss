@@ -1,0 +1,162 @@
+/* Custom styles for both blog content AND editor */
+.prose h1,
+.simple-editor h1,
+.tiptap.ProseMirror h1 {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  margin-bottom: 1.5rem !important;
+  margin-top: 0 !important;
+  color: #1f2937 !important;
+}
+
+.prose h2,
+.simple-editor h2,
+.tiptap.ProseMirror h2 {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  color: #374151 !important;
+}
+
+.prose h3,
+.simple-editor h3,
+.tiptap.ProseMirror h3 {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+  color: #4b5563 !important;
+}
+
+.prose p,
+.simple-editor p,
+.tiptap.ProseMirror p {
+  font-size: 1.125rem !important;
+  line-height: 1.7 !important;
+  margin-bottom: 1.5rem !important;
+  color: #374151 !important;
+}
+
+.prose blockquote,
+.simple-editor blockquote,
+.tiptap.ProseMirror blockquote {
+  border-left: 4px solid #3b82f6 !important;
+  background-color: #f8fafc !important;
+  padding: 1rem 1.5rem !important;
+  margin: 1.5rem 0 !important;
+  border-radius: 0 8px 8px 0 !important;
+  font-style: italic !important;
+}
+
+.prose strong,
+.simple-editor strong,
+.tiptap.ProseMirror strong {
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+}
+
+.prose em,
+.simple-editor em,
+.tiptap.ProseMirror em {
+  font-style: italic !important;
+  color: #4b5563 !important;
+}
+
+.prose a,
+.simple-editor a,
+.tiptap.ProseMirror a {
+  color: #3b82f6 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+.prose code,
+.simple-editor code,
+.tiptap.ProseMirror code {
+  background-color: #f1f5f9 !important;
+  color: #dc2626 !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 4px !important;
+  font-size: 0.9rem !important;
+}
+
+.prose pre,
+.simple-editor pre,
+.tiptap.ProseMirror pre {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  padding: 1rem !important;
+  border-radius: 8px !important;
+  margin: 1.5rem 0 !important;
+}
+
+.prose ul,
+.prose ol,
+.simple-editor ul,
+.simple-editor ol,
+.tiptap.ProseMirror ul,
+.tiptap.ProseMirror ol {
+  margin: 1.5rem 0 !important;
+  padding-left: 2rem !important;
+}
+
+.prose li,
+.simple-editor li,
+.tiptap.ProseMirror li {
+  font-size: 1.125rem !important;
+  line-height: 1.7 !important;
+  color: #374151 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.prose img,
+.simple-editor img,
+.tiptap.ProseMirror img {
+  margin: 2.5rem 0;
+  max-height: 450px;
+  object-fit: cover;
+
+  /* Make wider than content (adjust multiplier as needed) */
+  width: 120%; /* or 130%, 140%, etc. */
+  max-width: 110%;
+  margin-left: -5%; /* Half of the extra width */
+  margin-right: -5%;
+}
+
+/* EDITOR WIDTH MATCHING - This is the key fix! */
+.simple-editor-content .tiptap.ProseMirror {
+  max-width: 56rem !important; /* Same as max-w-4xl (896px) */
+  margin-left: auto !important; /* Center the content */
+  margin-right: auto !important; /* Center the content */
+  padding: 2rem !important; /* Same as blog post px-4 py-8 */
+  min-height: 400px !important; /* Larger editing area */
+  font-family: inherit !important; /* Match your site font */
+  width: 100% !important; /* Full width within container */
+  box-sizing: border-box !important; /* Include padding in width */
+}
+
+/* Ensure the editor wrapper doesn't constrain the content */
+.simple-editor-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.simple-editor-content {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Remove TipTap's default focus outline to match blog styling */
+.tiptap.ProseMirror:focus {
+  outline: none !important;
+}
+
+/* Additional responsive matching for the editor */
+@media (max-width: 768px) {
+  .simple-editor-content .tiptap.ProseMirror {
+    padding: 1rem !important; /* Match mobile blog post padding */
+    max-width: 100% !important; /* Full width on mobile */
+  }
+}
